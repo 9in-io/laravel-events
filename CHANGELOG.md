@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## 2.0.0 - unreleased
+## 2.0.1 - 2026-11-09
+
+Same code as 2.0.0, released again under a new version because the 2.0.0 tag was moved to a
+rewritten commit after Packagist had published it (published versions cannot change).
+
+## 2.0.0 - 2026-11-09
 
 Rebranded as **9in** (`9in/laravel-events`, namespace `Nine\Laravel\Events`). See [MIGRATION.md](MIGRATION.md).
 
