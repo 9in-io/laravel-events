@@ -1,38 +1,58 @@
-Shared Events for Laravel Packages
-=============
+9in Laravel Events
+==================
 
-This repository contains shared events used in our Laravel packages:
+Event classes shared by the [9in](https://9in.io) Laravel packages:
 
-- [SSOfy Laravel (Server) Package](https://github.com/ssofy/laravel-server) as the **sender**.
-- [SSOfy Laravel (Client) Package](https://github.com/ssofy/laravel) as the **receiver**.
+- [`9in/laravel-server`](https://github.com/9in-io/laravel-server) dispatches them for
+  **adapter notifications** (`POST <adapter>/event`), for apps that keep users in their own
+  database.
+- [`9in/laravel`](https://github.com/9in-io/laravel) dispatches them for **webhooks**, for apps
+  whose users are stored by 9in.
 
-### Reason for a standalone repository
+Both packages pull this one in. Require it directly only when you want the classes without
+either package:
 
-This standalone repository for events was created to promote clear separation of concerns and enhance reusability, 
-not only within our packages but also for other developers who may want to receive these events in their own Laravel projects.
-
-## Usage
-
-Include as a dependency in your `composer.json` file:
-
-```json
-{
-    "require": {
-        "ssofy/laravel-events": "1.0.0"
-    }
-}
+```bash
+composer require 9in/laravel-events:^2.0
 ```
 
-## Support
+## Events
 
-Feel free to reach support with any questions regarding the integration or reporting issues.
-Our technical experts are available around the clock to conduct investigations and provide
-the highest quality product and service support as quickly as possible.
+Every event extends `Nine\Laravel\Events\NineEvent` and keeps the original payload in
+`$event->event`. Accessors: `id()`, `type()`, `createdAt()`, `data()`, `userId()`, `sid()`, `user()`
+(webhooks), `tenant()`, `environment()`, `fromAdapter()`, `fromWebhook()`.
 
-## Author
+| Class | 9in event type | Adapter | Webhook |
+|---|---|:-:|:-:|
+| `OtpRequested` | `otp.requested`: deliver `code()` to `to()` by `channel()` | ✓ | |
+| `UserCreated` | `user.created` | ✓ | ✓ |
+| `UserUpdated` | `user.updated` (adapter events list the `fields`) | ✓ | ✓ |
+| `UserDeleted` | `user.deleted` | | ✓ |
+| `PasswordChanged` | `user.password_changed` | ✓ | ✓ |
+| `SessionsRevoked` | `session.revoked` (one session: `sid()`) / `user.sessions_revoked` (all of a user's) | ✓ | ✓ |
+| `TokenRevoked` | `token.revoked`: `tokenType()`, `jti()` (access tokens), `sid()`, `clientId()` | | ✓ |
+| `UserLoggedIn` | `user.login` | | ✓ |
+| `LoginFailed` | `user.login_failed` | | ✓ |
+| `MfaEnabled`, `MfaDisabled` | `user.mfa_enabled`, `user.mfa_disabled` | | ✓ |
+| `WebhookTest` | `webhook.test` | | ✓ |
+| `EventReceived` | every event, including types added later | ✓ | ✓ |
 
-**SSOfy** and derivatives are by [Cubelet Ltd](https://cubelet.co.uk).
+```php
+use Illuminate\Support\Facades\Event;
+use Nine\Laravel\Events\PasswordChanged;
+
+Event::listen(PasswordChanged::class, function (PasswordChanged $event) {
+    // $event->userId(): your user id (adapter) or the 9in user id (webhook)
+});
+```
+
+Event ids stay the same on every retry, so listeners can ignore duplicates by `id()`.
+
+`EventFactory::make($payload, $source)` returns the event for a payload;
+`EventFactory::all()` returns it followed by `EventReceived`.
+
+Upgrading from `ssofy/laravel-events` 1.x? Read [MIGRATION.md](MIGRATION.md).
 
 ## License
 
-The MIT License (MIT). Please see [License](LICENSE) File for more information.
+The MIT License (MIT). See [LICENSE](LICENSE). 9in and SSOfy are by [Cubelet Ltd](https://cubelet.co.uk).
