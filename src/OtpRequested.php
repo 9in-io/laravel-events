@@ -34,7 +34,7 @@ class OtpRequested extends NineEvent
 
     public function expiresAt(): ?\DateTimeImmutable
     {
-        $value = $this->data()['expiresAt'] ?? null;
+        $value = $this->data()['expires_at'] ?? null;
         return $value ? new \DateTimeImmutable((string) $value) : null;
     }
 }

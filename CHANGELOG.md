@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 3.0.0 - 2026-11-10
+
+Breaking: reads 9in's snake_case payloads (the 9in release of 2026-11-10). See [MIGRATION.md](MIGRATION.md).
+
+* `EventFactory` maps by `event` (was `type`); `type()` and `createdAt()` read `event` and `created_at`.
+* `userId()` reads `data.user_id` (adapter) or `data.user.id` (webhook); webhooks no longer send `data.userId`.
+* `OtpRequested::expiresAt()` reads `expires_at`; `TokenRevoked::tokenType()` / `clientId()` read
+  `token_type` / `client_id`.
+
 ## 2.0.1 - 2026-11-09
 
 Same code as 2.0.0, released again under a new version because the 2.0.0 tag was moved to a

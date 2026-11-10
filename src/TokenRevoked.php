@@ -11,7 +11,7 @@ class TokenRevoked extends NineEvent
     /** access_token | refresh_token */
     public function tokenType(): string
     {
-        return (string) ($this->data()['type'] ?? '');
+        return (string) ($this->data()['token_type'] ?? '');
     }
 
     public function isAccessToken(): bool
@@ -28,7 +28,7 @@ class TokenRevoked extends NineEvent
 
     public function clientId(): ?string
     {
-        $id = $this->data()['clientId'] ?? null;
+        $id = $this->data()['client_id'] ?? null;
         return $id === null ? null : (string) $id;
     }
 }

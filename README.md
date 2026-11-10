@@ -13,14 +13,16 @@ Both packages pull this one in. Require it directly only when you want the class
 either package:
 
 ```bash
-composer require 9in/laravel-events:^2.0
+composer require 9in/laravel-events:^3.0
 ```
 
 ## Events
 
 Every event extends `Nine\Laravel\Events\NineEvent` and keeps the original payload in
-`$event->event`. Accessors: `id()`, `type()`, `createdAt()`, `data()`, `userId()`, `sid()`, `user()`
-(webhooks), `tenant()`, `environment()`, `fromAdapter()`, `fromWebhook()`.
+`$event->event`: `{id, event, created_at, data}` (webhooks add `tenant` and `environment`), with
+snake_case keys and ISO 8601 UTC times. Accessors: `id()`, `type()` (the payload's `event`),
+`createdAt()`, `data()`, `userId()`, `sid()`, `user()` (webhooks), `tenant()`, `environment()`,
+`fromAdapter()`, `fromWebhook()`.
 
 | Class | 9in event type | Adapter | Webhook |
 |---|---|:-:|:-:|
@@ -42,7 +44,7 @@ use Illuminate\Support\Facades\Event;
 use Nine\Laravel\Events\PasswordChanged;
 
 Event::listen(PasswordChanged::class, function (PasswordChanged $event) {
-    // $event->userId(): your user id (adapter) or the 9in user id (webhook)
+    // $event->userId(): your user id (adapter, data.user_id) or the 9in user id (webhook, data.user.id)
 });
 ```
 

@@ -33,14 +33,16 @@ abstract class NineEvent
         return (string) ($this->event['id'] ?? '');
     }
 
+    /** The event name, e.g. `user.created` (the payload's `event`). */
     public function type(): string
     {
-        return (string) ($this->event['type'] ?? '');
+        return (string) ($this->event['event'] ?? '');
     }
 
+    /** When the event happened (the payload's `created_at`, ISO 8601 UTC). */
     public function createdAt(): ?\DateTimeImmutable
     {
-        return isset($this->event['createdAt']) ? new \DateTimeImmutable((string) $this->event['createdAt']) : null;
+        return isset($this->event['created_at']) ? new \DateTimeImmutable((string) $this->event['created_at']) : null;
     }
 
     /**
@@ -52,12 +54,13 @@ abstract class NineEvent
     }
 
     /**
-     * The user the event is about: your own user id for adapter events, the 9in user id
-     * for webhooks.
+     * The user the event is about: your own user id for adapter events (`data.user_id`), the
+     * 9in user id for webhooks (`data.user.id`).
      */
     public function userId(): ?string
     {
-        $id = $this->data()['userId'] ?? null;
+        $data = $this->data();
+        $id   = $data['user_id'] ?? (isset($data['user']) && is_array($data['user']) ? ($data['user']['id'] ?? null) : null);
         return $id === null ? null : (string) $id;
     }
 
@@ -69,7 +72,8 @@ abstract class NineEvent
     }
 
     /**
-     * Snapshot of the 9in user (webhooks only; null once the user is deleted).
+     * The 9in user the event is about, as the Management API returns it (webhooks only; for
+     * `user.deleted`, the user as it was just before the deletion).
      *
      * @return array<string, mixed>|null
      */
