@@ -23,13 +23,13 @@ final class EventFactory
     ];
 
     /**
-     * The specific event for `$event['event']`, or null for events this version does not know.
+     * The specific event for `$event['event_type']`, or null for events this version does not know.
      *
      * @param array<string, mixed> $event
      */
     public static function make(array $event, string $source): ?NineEvent
     {
-        $class = self::MAP[(string) ($event['event'] ?? '')] ?? null;
+        $class = self::MAP[(string) ($event['event_type'] ?? '')] ?? null;
         return $class ? new $class($event, $source) : null;
     }
 

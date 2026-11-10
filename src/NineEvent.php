@@ -33,10 +33,10 @@ abstract class NineEvent
         return (string) ($this->event['id'] ?? '');
     }
 
-    /** The event name, e.g. `user.created` (the payload's `event`). */
+    /** The event name, e.g. `user.created` (the payload's `event_type`). */
     public function type(): string
     {
-        return (string) ($this->event['event'] ?? '');
+        return (string) ($this->event['event_type'] ?? '');
     }
 
     /** When the event happened (the payload's `created_at`, ISO 8601 UTC). */

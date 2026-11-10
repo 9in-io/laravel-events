@@ -18,7 +18,7 @@ final class EventFactoryTest extends TestCase
     {
         $event = EventFactory::make([
             'id'         => 'evt_1',
-            'event'      => 'otp.requested',
+            'event_type' => 'otp.requested',
             'created_at' => '2026-11-09T10:00:00.000Z',
             'data'       => ['user_id' => '42', 'channel' => 'sms', 'to' => '+447700900000', 'code' => '123456', 'purpose' => 'login', 'expires_at' => '2026-11-09T10:05:00.000Z'],
         ], NineEvent::SOURCE_ADAPTER);
@@ -37,7 +37,7 @@ final class EventFactoryTest extends TestCase
     {
         $event = EventFactory::make([
             'id'          => 'evt_2',
-            'event'       => 'user.created',
+            'event_type'  => 'user.created',
             'created_at'  => '2026-11-09T10:00:00.000Z',
             'tenant'      => 'tnt_1',
             'environment' => 'sandbox',
@@ -56,33 +56,33 @@ final class EventFactoryTest extends TestCase
 
     public function testBothSessionEventsMapToOneClass(): void
     {
-        $this->assertInstanceOf(SessionsRevoked::class, EventFactory::make(['event' => 'session.revoked'], 'adapter'));
-        $this->assertInstanceOf(SessionsRevoked::class, EventFactory::make(['event' => 'user.sessions_revoked'], 'webhook'));
+        $this->assertInstanceOf(SessionsRevoked::class, EventFactory::make(['event_type' => 'session.revoked'], 'adapter'));
+        $this->assertInstanceOf(SessionsRevoked::class, EventFactory::make(['event_type' => 'user.sessions_revoked'], 'webhook'));
     }
 
     public function testSessionAndTokenRevocationWebhooks(): void
     {
-        $session = EventFactory::make(['id' => 'e1', 'event' => 'session.revoked', 'data' => ['sid' => 'sid_1', 'user' => ['id' => 'usr_1']]], 'webhook');
+        $session = EventFactory::make(['id' => 'e1', 'event_type' => 'session.revoked', 'data' => ['sid' => 'sid_1', 'user' => ['id' => 'usr_1']]], 'webhook');
         $this->assertInstanceOf(SessionsRevoked::class, $session);
         $this->assertSame('sid_1', $session->sid());
         $this->assertSame('usr_1', $session->userId());
 
-        $token = EventFactory::make(['id' => 'e2', 'event' => 'token.revoked', 'data' => ['token_type' => 'access_token', 'jti' => 'j1', 'sid' => 'sid_1', 'client_id' => 'app_1', 'user' => ['id' => 'usr_1']]], 'webhook');
+        $token = EventFactory::make(['id' => 'e2', 'event_type' => 'token.revoked', 'data' => ['token_type' => 'access_token', 'jti' => 'j1', 'sid' => 'sid_1', 'client_id' => 'app_1', 'user' => ['id' => 'usr_1']]], 'webhook');
         $this->assertInstanceOf(TokenRevoked::class, $token);
         $this->assertTrue($token->isAccessToken());
         $this->assertSame('j1', $token->jti());
         $this->assertSame('app_1', $token->clientId());
         $this->assertSame('sid_1', $token->sid());
 
-        $refresh = EventFactory::make(['event' => 'token.revoked', 'data' => ['token_type' => 'refresh_token', 'client_id' => 'app_1']], 'webhook');
+        $refresh = EventFactory::make(['event_type' => 'token.revoked', 'data' => ['token_type' => 'refresh_token', 'client_id' => 'app_1']], 'webhook');
         $this->assertSame('refresh_token', $refresh->tokenType());
         $this->assertNull($refresh->jti());
     }
 
     public function testUnknownTypesStillProduceEventReceived(): void
     {
-        $this->assertNull(EventFactory::make(['event' => 'user.future_thing'], 'webhook'));
-        $all = EventFactory::all(['event' => 'user.future_thing', 'data' => 'not-an-array'], 'webhook');
+        $this->assertNull(EventFactory::make(['event_type' => 'user.future_thing'], 'webhook'));
+        $all = EventFactory::all(['event_type' => 'user.future_thing', 'data' => 'not-an-array'], 'webhook');
         $this->assertCount(1, $all);
         $this->assertInstanceOf(EventReceived::class, $all[0]);
         $this->assertSame([], $all[0]->data());
@@ -90,7 +90,7 @@ final class EventFactoryTest extends TestCase
 
     public function testAllDispatchesSpecificThenGeneric(): void
     {
-        $all = EventFactory::all(['event' => 'user.updated', 'data' => ['user_id' => 'u', 'fields' => ['name']]], 'adapter');
+        $all = EventFactory::all(['event_type' => 'user.updated', 'data' => ['user_id' => 'u', 'fields' => ['name']]], 'adapter');
         $this->assertInstanceOf(UserUpdated::class, $all[0]);
         $this->assertSame('u', $all[0]->userId());
         // The old envelope is not recognised.

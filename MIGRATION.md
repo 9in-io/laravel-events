@@ -7,7 +7,7 @@
 
 | Accessor | 2.x read | 3.x reads |
 |---|---|---|
-| `type()` | `type` | `event` |
+| `type()` | `type` | `event_type` |
 | `createdAt()` | `createdAt` | `created_at` |
 | `userId()` | `data.userId` | `data.user_id` (adapter) or `data.user.id` (webhook) |
 | `OtpRequested::expiresAt()` | `data.expiresAt` | `data.expires_at` |

@@ -19,8 +19,8 @@ composer require 9in/laravel-events:^3.0
 ## Events
 
 Every event extends `Nine\Laravel\Events\NineEvent` and keeps the original payload in
-`$event->event`: `{id, event, created_at, data}` (webhooks add `tenant` and `environment`), with
-snake_case keys and ISO 8601 UTC times. Accessors: `id()`, `type()` (the payload's `event`),
+`$event->event`: `{id, event_type, created_at, data}` (webhooks add `tenant` and `environment`), with
+snake_case keys and ISO 8601 UTC times. Accessors: `id()`, `type()` (the payload's `event_type`),
 `createdAt()`, `data()`, `userId()`, `sid()`, `user()` (webhooks), `tenant()`, `environment()`,
 `fromAdapter()`, `fromWebhook()`.
 
