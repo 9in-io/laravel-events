@@ -53,8 +53,6 @@ Event ids stay the same on every retry, so listeners can ignore duplicates by `i
 `EventFactory::make($payload, $source)` returns the event for a payload;
 `EventFactory::all()` returns it followed by `EventReceived`.
 
-Upgrading from `ssofy/laravel-events` 1.x? Read [MIGRATION.md](MIGRATION.md).
-
 ## License
 
-The MIT License (MIT). See [LICENSE](LICENSE). 9in and SSOfy are by [Cubelet Ltd](https://cubelet.co.uk).
+The MIT License (MIT). See [LICENSE](LICENSE). 9in is by [Cubelet Ltd](https://cubelet.co.uk).
